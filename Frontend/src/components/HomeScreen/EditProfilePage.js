@@ -207,6 +207,7 @@ const styles = StyleSheet.create({
         borderColor: '#CCCCCC',
         color: "#000",
         padding: 10,
+        fontWeight: '900',
         borderRadius: 5,
         marginBottom: 15,
     },

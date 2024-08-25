@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet, Alert, Act
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Snackbar from 'react-native-snackbar';
 import config from '../../config';
 
 const FavoritesScreen = ({ navigation }) => {
@@ -35,10 +36,10 @@ const FavoritesScreen = ({ navigation }) => {
                 const response = await fetch(`${config}/favorites/getFavorites?email=${email}`);
                 const data = await response.json();
                 setFavorites(data);
-                setLoading(false); // Set loading to false after data is fetched
+                setLoading(false);
             } catch (error) {
                 console.error('Error fetching favorite items:', error);
-                setLoading(false); // Set loading to false even if there is an error
+                setLoading(false); 
             }
         };
 
@@ -46,7 +47,7 @@ const FavoritesScreen = ({ navigation }) => {
     }, []);
 
     useEffect(() => {
-        // Filter favorites based on the search query
+       
         const filtered = Object.values(favorites).filter(item =>
             item.productDetails && item.productDetails.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
@@ -66,7 +67,6 @@ const FavoritesScreen = ({ navigation }) => {
             setQuantities(newQuantities);
         }
     };
-
     const handleAddToCart = async (productId, quantity) => {
         try {
             const response = await axios.post(`${config}/addcart`, {
@@ -76,14 +76,30 @@ const FavoritesScreen = ({ navigation }) => {
             });
 
             if (response.status === 200) {
-                Alert.alert('Success', 'Product added to cart!');
+                Snackbar.show({
+                    text: 'Product added to cart!',
+                    duration: Snackbar.LENGTH_SHORT,
+                    backgroundColor: '#0fa140',
+                    textColor: '#fff',
+                });
             }
         } catch (error) {
             if (error.response && error.response.status === 400) {
-                Alert.alert('Info', 'Product is already in the cart.');
+                Snackbar.show({
+                    text: 'Product is already in the cart.',
+                    duration: Snackbar.LENGTH_SHORT,
+                    backgroundColor: '#0fa140',
+                    textColor: '#fff',
+
+                });
             } else {
                 console.error('Failed to add product to cart:', error);
-                Alert.alert('Error', 'Failed to add product to cart.');
+                Snackbar.show({
+                    text: 'Failed to add product to cart.',
+                    duration: Snackbar.LENGTH_SHORT,
+                    backgroundColor: '#d9534f',
+                    textColor: '#fff',
+                });
             }
         }
     };
@@ -101,28 +117,42 @@ const FavoritesScreen = ({ navigation }) => {
 
             if (response.status === 200) {
                 const message = response.data.message;
-
-                // Update favorites state only if the product was successfully added or removed
                 setFavorites(newFavorites);
 
-                // Show appropriate alert based on the server response
+                let snackBarMessage = 'Failed to update favorites.';
                 if (message === 'Added to favorites') {
-                    Alert.alert('Success', 'Added to favorites');
+                    snackBarMessage = 'Added to favorites';
                 } else if (message === 'Removed from favorites') {
-                    Alert.alert('Success', 'Removed from favorites');
+                    snackBarMessage = 'Removed from favorites';
                 } else if (message === 'Product is already in favorites') {
-                    Alert.alert('Info', 'Product is already in favorites');
-                } else {
-                    Alert.alert('Error', 'Failed to update favorites.');
+                    snackBarMessage = 'Product is already in favorites';
                 }
+
+                Snackbar.show({
+                    text: snackBarMessage,
+                    duration: Snackbar.LENGTH_SHORT,
+                    backgroundColor: '#0fa140',
+                    textColor: '#fff',
+                });
             } else {
-                Alert.alert('Error', 'Failed to update favorites.');
+                Snackbar.show({
+                    text: 'Failed to update favorites.',
+                    duration: Snackbar.LENGTH_SHORT,
+                    backgroundColor: '#d9534f',
+                    textColor: '#fff',
+                });
             }
         } catch (error) {
             console.error('Failed to update favorites:', error);
-            Alert.alert('Error', 'Failed to update favorites.');
+            Snackbar.show({
+                text: 'Failed to update favorites.',
+                duration: Snackbar.LENGTH_SHORT,
+                backgroundColor: '#d9534f',
+                textColor: '#fff',
+            });
         }
     };
+
 
     return (
         <View style={styles.container}>

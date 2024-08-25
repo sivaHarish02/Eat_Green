@@ -276,6 +276,7 @@ const styles = StyleSheet.create({
     productName: {
         fontSize: 16,
         fontWeight: 'bold',
+        color:"rgb(8, 154, 64)",
         marginBottom: 0,
     },
     productWeight: {
